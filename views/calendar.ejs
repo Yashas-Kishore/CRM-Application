@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Current Month Calendar</title>
+</head>
+<body>
+  <h1>Calendar for the Current Month</h1>
+
+  <ul>
+    <% formattedDays.forEach(function(day) { %>
+      <li><%= day %></li>
+    <% }); %>
+  </ul>
+
+  <button onclick="window.location.href='/dashboard';">Back to Main Menu</button>
+</body>
+</html>

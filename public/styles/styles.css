@@ -1,0 +1,103 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.side-menu-wrapper {
+    width: 250px;
+    background-color: #f4f4f4;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+
+.side-menu-btn-icons-container {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.sub-menu-btn-container {
+    margin-bottom: 15px;
+}
+
+.sub-menu-btns {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.sub-menu-btns img {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+}
+
+.main-content {
+    margin-left: 250px;
+    padding: 20px;
+}
+
+.side-menu-tabs-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.fees-payments-wrapper {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.fees-payments-heading b {
+    font-size: 18px;
+}
+
+.payment-container {
+    margin-top: 20px;
+}
+
+.title-amount-wrapper {
+    display: flex;
+    justify-content: space-between;
+}
+
+.title-amount {
+    flex: 1;
+    margin-right: 20px;
+}
+
+.total-amount {
+    font-size: 16px;
+}
+
+.slds-tabs_scoped__nav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+
+.slds-tabs_scoped__item {
+    margin-right: 10px;
+}
+
+.slds-tabs_scoped__item a {
+    text-decoration: none;
+    color: #007bff;
+    padding: 10px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.slds-tabs_scoped__item.slds-is-active a {
+    background-color: #e9ecef;
+}
+
+.slds-tabs_scoped__content {
+    margin-top: 20px;
+}

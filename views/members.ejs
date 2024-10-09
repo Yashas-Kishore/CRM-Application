@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Members</title>
+    <link rel="stylesheet" href="/styles/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        .container {
+            padding: 20px;
+            max-width: 900px;
+            margin: auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #0078d4;
+        }
+        p {
+            font-size: 18px;
+            margin: 0 0 20px 0;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        li:last-child {
+            border-bottom: none;
+        }
+        strong {
+            color: #005a9e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Members</h1>
+        <p>Total Members: <%= totalMembers %></p>
+        
+        <% if (members && members.length > 0) { %>
+            <ul>
+                <% members.forEach(function(member) { %>
+                    <li>
+                        <strong>Name:</strong> <%= member.displayName %>, 
+                        <strong>Email:</strong> <%= member.mail %>
+                    </li>
+                <% }); %>
+            </ul>
+        <% } else { %>
+            <p>No members found.</p>
+        <% } %>
+    </div>
+</body>
+</html>

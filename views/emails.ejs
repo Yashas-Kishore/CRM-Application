@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Emails</title>
+</head>
+<body>
+  <h1>Emails</h1>
+
+  <ul>
+    <% if (emails && emails.length > 0) { %>
+      <% emails.forEach(email => { %>
+        <li>
+          <strong>From:</strong> <%= email.from ? email.from.emailAddress.name : 'Unknown' %> (<%= email.from ? email.from.emailAddress.address : 'Unknown' %>)<br>
+          <strong>Subject:</strong> <%= email.subject %><br>
+          <strong>Received:</strong> <%= new Date(email.receivedDateTime).toLocaleString() %>
+        </li>
+      <% }) %>
+    <% } else { %>
+      <li>No emails found.</li>
+    <% } %>
+  </ul>
+
+  <a href="/dashboard">Back to Dashboard</a>
+</body>
+</html>
