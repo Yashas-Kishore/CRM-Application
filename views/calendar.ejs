@@ -13,5 +13,88 @@
   </ul>
 
   <button onclick="window.location.href='/dashboard';">Back to Main Menu</button>
+</body><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendar for <%= monthName %> <%= currentYear %></title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .calendar-container {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+      margin: 20px;
+      padding: 10px;
+    }
+    .calendar-item {
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 5px;
+      text-align: center;
+      background-color: #f9f9f9;
+    }
+    .task-available {
+      background-color: #c8e6c9;
+    }
+    .no-task {
+      background-color: #ffcdd2;
+    }
+    .calendar-header {
+      font-weight: bold;
+    }
+    .navigation {
+      margin: 20px;
+      text-align: center;
+    }
+    button {
+      margin: 5px;
+    }
+    .empty-cell {
+      visibility: hidden;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Calendar for <%= monthName %> <%= currentYear %></h1>
+
+  <!-- Calendar Grid -->
+  <div class="calendar-container">
+    <!-- Headers for Days of the Week -->
+    <div class="calendar-header">Sunday</div>
+    <div class="calendar-header">Monday</div>
+    <div class="calendar-header">Tuesday</div>
+    <div class="calendar-header">Wednesday</div>
+    <div class="calendar-header">Thursday</div>
+    <div class="calendar-header">Friday</div>
+    <div class="calendar-header">Saturday</div>
+
+    <!-- Placeholder cells to align the first day of the month -->
+    <% for (let i = 0; i < firstDayOfMonth; i++) { %>
+      <div class="calendar-item empty-cell"></div>
+    <% } %>
+
+    <!-- Days with Tasks or No Tasks -->
+    <% daysInMonth.forEach(function(day) { %>
+      <div class="calendar-item <%= day.hasTask ? 'task-available' : 'no-task' %>">
+        <strong><%= day.date %></strong><br>
+        <%= day.hasTask ? 'Task Available' : 'No Task' %>
+      </div>
+    <% }); %>
+  </div>
+
+  <!-- Navigation and Back Buttons -->
+  <div class="navigation">
+    <button onclick="window.location.href='/calendar?month=<%= prevMonth %>';">Previous Month</button>
+    <button onclick="window.location.href='/calendar?month=<%= nextMonth %>';">Next Month</button>
+    <button onclick="window.location.href='/dashboard';">Back to Main Menu</button>
+  </div>
+
 </body>
+</html>
+
 </html>
