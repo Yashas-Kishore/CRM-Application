@@ -37,6 +37,9 @@
       box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
       border-radius: 5px;
     }
+    .clickable-row {
+      cursor: pointer;
+    }
     /* Buttons */
     .back-button {
       display: inline-block;
@@ -67,7 +70,7 @@
     <tbody>
       <% if (emails && emails.length > 0) { %>
         <% emails.forEach(email => { %>
-          <tr>
+            <tr class="clickable-row" onclick="window.location.href='/emails/<%= email.id %>'">
             <td class="checkbox-cell"><input type="checkbox" name="emailSelect" /></td>
             <td><%= email.from ? email.from.emailAddress.name : 'Unknown' %> (<%= email.from ? email.from.emailAddress.address : 'Unknown' %>)</td>
             <td><%= email.subject %></td>

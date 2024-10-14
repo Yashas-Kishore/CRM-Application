@@ -24,7 +24,7 @@ router.get('/', (req, res) => {
 });
 
 // Route to retrieve a single email by ID
-router.get('/:id', (req, res) => {
+router.get('/email/:id', (req, res) =>  {
   const token = req.session.accessToken;
   const emailId = req.params.id;
   if (!token) return res.status(401).send('Authentication required');
@@ -50,7 +50,11 @@ router.post('/send', (req, res) => {
 
   const graphEndpoint = 'https://graph.microsoft.com/v1.0/me/sendMail';
   const emailData = {
-    message: { subject, body: { contentType: 'Text', content: body }, toRecipients: [{ emailAddress: { address: to } }] },
+    message: { 
+      subject, 
+      body: { contentType: 'Text', content: body }, 
+      toRecipients: [{ emailAddress: { address: to } }] 
+    },
     saveToSentItems: "true",
   };
 

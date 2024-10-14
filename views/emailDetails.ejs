@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Details</title>
+  <style>
+    /* Add some styling for the email details view */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .email-details {
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+    .back-button {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #0078d4;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+    .back-button:hover {
+      background-color: #005a9e;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="email-details">
+    <h2>Subject: <%= email.subject %></h2>
+    <p><strong>From:</strong> <%= email.from.emailAddress.name %> (<%= email.from.emailAddress.address %>)</p>
+    <p><strong>Received:</strong> <%= new Date(email.receivedDateTime).toLocaleString() %></p>
+    <hr>
+    <p><%= email.body.content %></p>
+  </div>
+
+  <a href="/dashboard" class="back-button">Back to Emails</a>
+
+</body>
+</html>

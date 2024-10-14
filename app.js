@@ -20,12 +20,16 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'fallback-secret-key',
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false }
+  cookie: { secure: process.env.NODE_ENV === 'production' } // Secure cookies in production
 }));
 
 // MSAL configuration
 const config = {
-  auth: { clientId: process.env.CLIENT_ID, authority: `https://login.microsoftonline.com/${process.env.TENANT_ID}`, clientSecret: process.env.CLIENT_SECRET }
+  auth: {
+    clientId: process.env.CLIENT_ID,
+    authority: `https://login.microsoftonline.com/${process.env.TENANT_ID}`,
+    clientSecret: process.env.CLIENT_SECRET
+  }
 };
 
 const pca = new msal.ConfidentialClientApplication(config);
@@ -48,7 +52,7 @@ app.use('/members', memberRoutes);
 
 // Authentication routes
 app.get('/auth', (req, res) => {
-  const authUrlParams = { scopes: ['User.Read', 'Mail.Read', 'User.Read.All', 'Group.Read.All'], redirectUri: redirectUri };
+  const authUrlParams = { scopes: ['User.Read', 'Mail.Read', 'User.Read.All', 'Group.Read.All'], redirectUri };
 
   pca.getAuthCodeUrl(authUrlParams)
     .then((response) => res.redirect(response))
@@ -59,12 +63,17 @@ app.get('/auth', (req, res) => {
 });
 
 app.get('/auth-callback', (req, res) => {
-  const tokenRequest = { code: req.query.code, scopes: ['User.Read', 'Mail.Read', 'User.Read.All', 'Group.Read.All'], redirectUri: redirectUri };
+  const tokenRequest = {
+    code: req.query.code,
+    scopes: ['User.Read', 'Mail.Read', 'User.Read.All', 'Group.Read.All'],
+    redirectUri
+  };
 
   pca.acquireTokenByCode(tokenRequest)
     .then((response) => {
       req.session.accessToken = response.accessToken;
-      res.redirect(`/dashboard?userName=${encodeURIComponent(response.account.name)}`);
+      const userName = response.account?.name || 'Guest';
+      res.redirect(`/dashboard?userName=${encodeURIComponent(userName)}`);
     })
     .catch((error) => {
       console.error('Error acquiring token:', error);
@@ -76,6 +85,10 @@ app.get('/auth-callback', (req, res) => {
 app.get('/dashboard', (req, res) => {
   const token = req.session.accessToken;
   const userName = req.query.userName || 'Guest';
+
+  console.log('Session access token:', token);
+  console.log('UserName:', userName);
+
   res.render('dashboard', { userName, token });
 });
 
