@@ -4,24 +4,95 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>User Emails</title>
+  <style>
+    /* Table styles */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: Arial, sans-serif;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #f4f4f4; /* Light grey for header */
+      color: #333;
+      font-weight: bold;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9; /* Alternating row color */
+    }
+    tr:hover {
+      background-color: #f1f1f1; /* Hover effect */
+    }
+    .checkbox-cell {
+      width: 5%;
+      text-align: center;
+    }
+    /* Outlook-like styling */
+    .email-table {
+      margin: 20px 0;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 5px;
+    }
+    /* Buttons */
+    .back-button {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #0078d4;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    .back-button:hover {
+      background-color: #005a9e;
+    }
+  </style>
 </head>
 <body>
-  <h1>Emails</h1>
+  <h1>User Emails</h1>
 
-  <ul>
-    <% if (emails && emails.length > 0) { %>
-      <% emails.forEach(email => { %>
-        <li>
-          <strong>From:</strong> <%= email.from ? email.from.emailAddress.name : 'Unknown' %> (<%= email.from ? email.from.emailAddress.address : 'Unknown' %>)<br>
-          <strong>Subject:</strong> <%= email.subject %><br>
-          <strong>Received:</strong> <%= new Date(email.receivedDateTime).toLocaleString() %>
-        </li>
-      <% }) %>
-    <% } else { %>
-      <li>No emails found.</li>
-    <% } %>
-  </ul>
+  <!-- Email Table -->
+  <table class="email-table">
+    <thead>
+      <tr>
+        <th class="checkbox-cell"><input type="checkbox" onclick="toggleSelectAll(this)" /></th>
+        <th>From</th>
+        <th>Subject</th>
+        <th>Received</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (emails && emails.length > 0) { %>
+        <% emails.forEach(email => { %>
+          <tr>
+            <td class="checkbox-cell"><input type="checkbox" name="emailSelect" /></td>
+            <td><%= email.from ? email.from.emailAddress.name : 'Unknown' %> (<%= email.from ? email.from.emailAddress.address : 'Unknown' %>)</td>
+            <td><%= email.subject %></td>
+            <td><%= new Date(email.receivedDateTime).toLocaleString() %></td>
+          </tr>
+        <% }) %>
+      <% } else { %>
+        <tr>
+          <td colspan="4">No emails found.</td>
+        </tr>
+      <% } %>
+    </tbody>
+  </table>
 
-  <a href="/dashboard">Back to Dashboard</a>
+  <!-- Back to Dashboard button -->
+  <a href="/dashboard" class="back-button">Back to Dashboard</a>
+
+  <script>
+    // Toggle select all checkboxes
+    function toggleSelectAll(source) {
+      const checkboxes = document.getElementsByName('emailSelect');
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = source.checked;
+      });
+    }
+  </script>
 </body>
 </html>
