@@ -1,101 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Emails</title>
-  <style>
-    /* Table styles */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-family: Arial, sans-serif;
-    }
-    th, td {
-      padding: 12px;
-      text-align: left;
-      border-bottom: 1px solid #ddd;
-    }
-    th {
-      background-color: #f4f4f4; /* Light grey for header */
-      color: #333;
-      font-weight: bold;
-    }
-    tr:nth-child(even) {
-      background-color: #f9f9f9; /* Alternating row color */
-    }
-    tr:hover {
-      background-color: #f1f1f1; /* Hover effect */
-    }
-    .checkbox-cell {
-      width: 5%;
-      text-align: center;
-    }
-    /* Outlook-like styling */
-    .email-table {
-      margin: 20px 0;
-      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-      border-radius: 5px;
-    }
-    .clickable-row {
-      cursor: pointer;
-    }
-    /* Buttons */
-    .back-button {
-      display: inline-block;
-      padding: 10px 20px;
-      background-color: #0078d4;
-      color: white;
-      text-decoration: none;
-      border-radius: 5px;
-    }
-    .back-button:hover {
-      background-color: #005a9e;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Emails</title>
+    <style>
+        /* Table styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: Arial, sans-serif;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f4f4f4; /* Light grey for header */
+            color: #333;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9; /* Alternating row color */
+        }
+        tr:hover {
+            background-color: #f1f1f1; /* Hover effect */
+        }
+        .checkbox-cell {
+            width: 5%;
+            text-align: center;
+        }
+        /* Outlook-like styling */
+        .email-table {
+            margin: 20px 0;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+        .clickable-row {
+            cursor: pointer;
+        }
+        /* Buttons */
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #0078d4;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .back-button:hover {
+            background-color: #005a9e;
+        }
+        /* Popup Styles */
+        #email-details {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9; /* Light background */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            display: none; /* Hidden by default */
+            z-index: 1000; /* Ensure it appears above other content */
+        }
+    </style>
 </head>
 <body>
-  <h1>User Emails</h1>
+    <h1>User Emails</h1>
 
-  <!-- Email Table -->
-  <table class="email-table">
-    <thead>
-      <tr>
-        <th class="checkbox-cell"><input type="checkbox" onclick="toggleSelectAll(this)" /></th>
-        <th>From</th>
-        <th>Subject</th>
-        <th>Received</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% if (emails && emails.length > 0) { %>
-        <% emails.forEach(email => { %>
-            <tr class="clickable-row" onclick="window.location.href='/emails/<%= email.id %>'">
-            <td class="checkbox-cell"><input type="checkbox" name="emailSelect" /></td>
-            <td><%= email.from ? email.from.emailAddress.name : 'Unknown' %> (<%= email.from ? email.from.emailAddress.address : 'Unknown' %>)</td>
-            <td><%= email.subject %></td>
-            <td><%= new Date(email.receivedDateTime).toLocaleString() %></td>
-          </tr>
-        <% }) %>
-      <% } else { %>
-        <tr>
-          <td colspan="4">No emails found.</td>
-        </tr>
-      <% } %>
-    </tbody>
-  </table>
+    <!-- Email Table -->
+    <table class="email-table">
+        <thead>
+            <tr>
+                <th class="checkbox-cell"><input type="checkbox" onclick="toggleSelectAll(this)" /></th>
+                <th>From</th>
+                <th>Subject</th>
+                <th>Received</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (emails && emails.length > 0) { %>
+                <% emails.forEach(email => { %>
+                    <tr class="clickable-row" onclick="fetchEmail('<%= email.id %>')">
+                        <td class="checkbox-cell"><input type="checkbox" name="emailSelect" /></td>
+                        <td><%= email.from ? email.from.emailAddress.name : 'Unknown' %> (<%= email.from ? email.from.emailAddress.address : 'Unknown' %>)</td>
+                        <td><%= email.subject %></td>
+                        <td><%= new Date(email.receivedDateTime).toLocaleString() %></td>
+                        <% email %>
+                    </tr>
+                <% }) %>
+            <% } else { %>
+                <tr>
+                    <td colspan="4">No emails found.</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+    <!-- Back to Dashboard button -->
+    <a href="/dashboard" class="back-button">Back to Dashboard</a>
 
-  <!-- Back to Dashboard button -->
-  <a href="/dashboard" class="back-button">Back to Dashboard</a>
+    <!-- Popup for email details -->
+    <div id="email-details"></div>
 
-  <script>
-    // Toggle select all checkboxes
-    function toggleSelectAll(source) {
-      const checkboxes = document.getElementsByName('emailSelect');
-      checkboxes.forEach(checkbox => {
-        checkbox.checked = source.checked;
-      });
-    }
-  </script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        // Toggle select all checkboxes
+        function toggleSelectAll(source) {
+            const checkboxes = document.getElementsByName('emailSelect');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = source.checked;
+            });
+        }
+    
+        document.addEventListener('DOMContentLoaded', function() {
+          function fetchEmail(emailId) {
+    axios.get(`/emails/email/${emailId}`)
+        .then(response => {
+            console.log('API Response:', response.data); // Log the response to check its structure
+            const data = response.data;
+            const emailDetailsDiv = document.getElementById('email-details');
+
+            // Access the properties based on the actual response structure
+            const emailBody = data.body && data.body.content ? data.body.content : 'No content available';
+            const emailSender = data.sender ? data.sender.emailAddress.name : 'Unknown sender'; // Adjust according to your API
+            const emailSubject = data.subject ? data.subject : 'No subject'; // Adjust according to your API
+            const receivedDate = data.receivedDateTime ? new Date(data.receivedDateTime).toLocaleString() : 'Unknown date'; // Ensure it's a date object
+
+            // Update email details in the div
+            emailDetailsDiv.innerHTML = `
+                <h2>${emailSubject}</h2>
+                <p>From: ${emailSender}</p>
+                <p>Received: ${receivedDate}</p>
+                <p>${emailBody}</p>
+            `;
+            // Show the popup
+            emailDetailsDiv.style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Error fetching email:', error);
+            const emailDetailsDiv = document.getElementById('email-details');
+            emailDetailsDiv.innerHTML = `<p>Error fetching email details. Please try again later.</p>`;
+            emailDetailsDiv.style.display = 'block';
+        });
+}
+
+    
+            // Attach the fetchEmail function to the window object for global access
+            window.fetchEmail = fetchEmail;
+        });
+    </script>
 </body>
 </html>

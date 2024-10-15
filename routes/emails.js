@@ -15,6 +15,7 @@ router.get('/', (req, res) => {
   })
   .then((response) => {
     const emails = response.data.value;
+    debugger
     res.render('emails', { emails });
   })
   .catch((error) => {
@@ -27,20 +28,35 @@ router.get('/', (req, res) => {
 router.get('/email/:id', (req, res) =>  {
   const token = req.session.accessToken;
   const emailId = req.params.id;
-  if (!token) return res.status(401).send('Authentication required');
+
+  if (!token) {
+    return res.status(401).send('Authentication required');
+  }
+
+  console.log('Email ID:', emailId);
+  console.log('Access Token:', token);
 
   const graphEndpoint = `https://graph.microsoft.com/v1.0/me/messages/${emailId}`;
 
   axios.get(graphEndpoint, { headers: { Authorization: `Bearer ${token}` } })
     .then((response) => {
-      const email = response.data;
-      res.render('email', { email });
+      if (response.status === 200) {
+        const email = response.data;
+        res.render('email', { email });
+      } else {
+        res.status(404).send('Email not found');
+      }
     })
     .catch((error) => {
-      console.error('Error retrieving email:', error);
+      if (error.response) {
+        console.error('Error retrieving email:', error.response.status, error.response.data);
+      } else {
+        console.error('Error retrieving email:', error.message);
+      }
       res.status(500).send('Error retrieving email');
     });
 });
+
 
 // Route to send a new email
 router.post('/send', (req, res) => {

@@ -8,22 +8,29 @@ const fs = require('fs');
 
 const app = express();
 
-// Check if SESSION_SECRET is set
+// Ensure SESSION_SECRET is set, or generate one dynamically
 if (!process.env.SESSION_SECRET) {
   const secretKey = crypto.randomBytes(32).toString('hex');
   fs.appendFileSync('.env', `\nSESSION_SECRET=${secretKey}\n`);
   console.log('New secret key generated and saved to .env file');
 }
 
-// Session setup
+// Middleware to serve static files (CSS, JS, images)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Session setup with secure cookies in production
 app.use(session({
   secret: process.env.SESSION_SECRET || 'fallback-secret-key',
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: process.env.NODE_ENV === 'production' } // Secure cookies in production
+  cookie: { secure: process.env.NODE_ENV === 'production' } // Secure cookies only in production
 }));
 
-// MSAL configuration
+// Set EJS as the view engine and define the views directory
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+// MSAL configuration for authentication
 const config = {
   auth: {
     clientId: process.env.CLIENT_ID,
@@ -31,28 +38,25 @@ const config = {
     clientSecret: process.env.CLIENT_SECRET
   }
 };
-
 const pca = new msal.ConfidentialClientApplication(config);
 const redirectUri = process.env.REDIRECT_URI;
-
-// Middleware
-app.use(express.static(path.join(__dirname, 'public')));
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
 
 // Import route files
 const calendarRoutes = require('./routes/calendar');
 const emailRoutes = require('./routes/emails');
 const memberRoutes = require('./routes/members');
 
-// Use routes
+// Use the imported routes for different functionalities
 app.use('/calendar', calendarRoutes);
 app.use('/emails', emailRoutes);
 app.use('/members', memberRoutes);
 
-// Authentication routes
+// Authentication route to redirect users for Microsoft login
 app.get('/auth', (req, res) => {
-  const authUrlParams = { scopes: ['User.Read', 'Mail.Read', 'User.Read.All', 'Group.Read.All'], redirectUri };
+  const authUrlParams = {
+    scopes: ['User.Read', 'Mail.Read', 'Calendars.Read'],
+    redirectUri
+  };
 
   pca.getAuthCodeUrl(authUrlParams)
     .then((response) => res.redirect(response))
@@ -62,18 +66,20 @@ app.get('/auth', (req, res) => {
     });
 });
 
+// Authentication callback route to acquire token after login
 app.get('/auth-callback', (req, res) => {
   const tokenRequest = {
     code: req.query.code,
-    scopes: ['User.Read', 'Mail.Read', 'User.Read.All', 'Group.Read.All'],
+    scopes: ['User.Read', 'Mail.Read', 'Calendars.Read'],
     redirectUri
   };
 
   pca.acquireTokenByCode(tokenRequest)
     .then((response) => {
-      req.session.accessToken = response.accessToken;
+      req.session.accessToken = response.accessToken; // Store access token in session
       const userName = response.account?.name || 'Guest';
-      res.redirect(`/dashboard?userName=${encodeURIComponent(userName)}`);
+      req.session.userName = userName; // Store userName in session
+      res.redirect('/dashboard');
     })
     .catch((error) => {
       console.error('Error acquiring token:', error);
@@ -81,10 +87,14 @@ app.get('/auth-callback', (req, res) => {
     });
 });
 
-// Dashboard route
+// Dashboard route (make sure the dashboard view exists)
 app.get('/dashboard', (req, res) => {
   const token = req.session.accessToken;
-  const userName = req.query.userName || 'Guest';
+  const userName = req.session.userName || 'Guest'; // Retrieve userName from session
+
+  if (!token) {
+    return res.status(401).send('Authentication required');
+  }
 
   console.log('Session access token:', token);
   console.log('UserName:', userName);
@@ -92,14 +102,15 @@ app.get('/dashboard', (req, res) => {
   res.render('dashboard', { userName, token });
 });
 
-// Logout route
+// Logout route with redirection to the homepage (index.html)
 app.get('/logout', (req, res) => {
   req.session.destroy((err) => {
     if (err) {
       console.error('Error logging out:', err);
       return res.status(500).send('Error during logout');
     }
-    res.redirect('/auth');
+    res.clearCookie('connect.sid', { path: '/' }); // Clear session cookie
+    res.redirect('/'); // Redirect to the root, which will serve index.html
   });
 });
 
