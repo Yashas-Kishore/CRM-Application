@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Email Details</title>
   <style>
-    /* Add some styling for the email details view */
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
@@ -31,16 +30,15 @@
   </style>
 </head>
 <body>
-
   <div class="email-details">
-    <h2>Subject: <%= email.subject %></h2>
-    <p><strong>From:</strong> <%= email.from.emailAddress.name %> (<%= email.from.emailAddress.address %>)</p>
+    <h2>Subject: <%= email.subject || 'No Subject' %></h2>
+    <p><strong>From:</strong> <%= email.from ? email.from.emailAddress.name : 'Unknown' %> (<%= email.from ? email.from.emailAddress.address : 'Unknown' %>)</p>
     <p><strong>Received:</strong> <%= new Date(email.receivedDateTime).toLocaleString() %></p>
     <hr>
-    <p><%= email.body.content %></p>
+    <p><%= email.body ? email.body.content : 'No content available' %></p>
   </div>
 
-  <a href="/dashboard" class="back-button">Back to Emails</a>
+  <a href="/emails" class="back-button">Back to Emails</a>
 
 </body>
 </html>

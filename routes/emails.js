@@ -11,12 +11,11 @@ router.get('/', (req, res) => {
 
   axios.get(graphEndpoint, {
     headers: { Authorization: `Bearer ${token}` },
-    params: { '$top': 10, '$orderby': 'receivedDateTime desc' },
+    params: { '$top': 100, '$orderby': 'receivedDateTime desc' },
   })
   .then((response) => {
     const emails = response.data.value;
-    debugger
-    res.render('emails', { emails });
+    res.render('emails', { emails });  // Renders email list
   })
   .catch((error) => {
     console.error('Error retrieving emails:', error);
@@ -33,16 +32,13 @@ router.get('/email/:id', (req, res) =>  {
     return res.status(401).send('Authentication required');
   }
 
-  console.log('Email ID:', emailId);
-  console.log('Access Token:', token);
-
   const graphEndpoint = `https://graph.microsoft.com/v1.0/me/messages/${emailId}`;
 
   axios.get(graphEndpoint, { headers: { Authorization: `Bearer ${token}` } })
     .then((response) => {
       if (response.status === 200) {
         const email = response.data;
-        res.render('email', { email });
+        res.render('email', { email });  // Renders single email view
       } else {
         res.status(404).send('Email not found');
       }
