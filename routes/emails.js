@@ -24,7 +24,10 @@ router.get('/', (req, res) => {
 });
 
 // Route to retrieve a single email by ID
-router.get('/email/:id', (req, res) =>  {
+const DOMPurify = require('dompurify');
+const { JSDOM } = require('jsdom');
+
+router.get('/email/:id', (req, res) => {
   const token = req.session.accessToken;
   const emailId = req.params.id;
 
@@ -38,7 +41,14 @@ router.get('/email/:id', (req, res) =>  {
     .then((response) => {
       if (response.status === 200) {
         const email = response.data;
-        res.render('email', { email });  // Renders single email view
+
+        // Sanitize the email body HTML content before sending it to the frontend
+        const window = new JSDOM('').window;
+        const purify = DOMPurify(window);
+        email.body.content = purify.sanitize(email.body.content);
+
+        // Render the email view with the sanitized content
+        res.render('email', { email });
       } else {
         res.status(404).send('Email not found');
       }

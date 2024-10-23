@@ -35,10 +35,13 @@
     <p><strong>From:</strong> <%= email.from ? email.from.emailAddress.name : 'Unknown' %> (<%= email.from ? email.from.emailAddress.address : 'Unknown' %>)</p>
     <p><strong>Received:</strong> <%= new Date(email.receivedDateTime).toLocaleString() %></p>
     <hr>
-    <p><%= email.body ? email.body.content : 'No content available' %></p>
+
+    <!-- Rendering the sanitized HTML email body -->
+    <div class="email-body" style="white-space: pre-wrap;">
+      <%- email.body ? email.body.content : 'No content available' %>
+    </div>
   </div>
 
   <a href="/emails" class="back-button">Back to Emails</a>
-
 </body>
 </html>
