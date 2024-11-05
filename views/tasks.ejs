@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Task Manager</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      color: #333;
+      margin: 20px;
+    }
+    .task-container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    h1 { text-align: center; color: #0078d4; }
+    .task, .task-form { border: 1px solid #ddd; padding: 10px; margin-bottom: 15px; }
+    .task-details { font-size: 0.9em; color: #666; }
+    .delete-button { background: #e74c3c; color: white; border: none; cursor: pointer; padding: 5px; }
+    .form-group { margin-bottom: 15px; }
+  </style>
+</head>
+<body>
+  <div class="task-container">
+    <h1>My Tasks</h1>
+
+    <% if (tasks.length > 0) { %>
+      <% tasks.forEach(task => { %>
+        <div class="task">
+          <div>
+            <p><strong><%= task.title %></strong></p>
+            <% if (task.dueDateTime) { %>
+              <p class="task-details">Due: <%= new Date(task.dueDateTime.dateTime).toLocaleString() %></p>
+            <% } %>
+          </div>
+          <form action="/tasks/<%= task.id %>/delete" method="POST">
+            <button type="submit" class="delete-button">Delete</button>
+          </form>
+        </div>
+      <% }); %>
+    <% } else { %>
+      <p>No tasks available. Add a new task below!</p>
+    <% } %>
+
+    <!-- Task creation form -->
+    <div class="task-form">
+      <form action="/tasks/create" method="POST">
+        <div class="form-group">
+          <label for="taskTitle">Task Title:</label>
+          <input type="text" id="taskTitle" name="taskTitle" required>
+        </div>
+        <div class="form-group">
+          <label for="dueDateTime">Due Date (optional):</label>
+          <input type="datetime-local" id="dueDateTime" name="dueDateTime">
+        </div>
+        <button type="submit">Add Task</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
