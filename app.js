@@ -56,6 +56,11 @@ app.use('/emails', emailRoutes);
 app.use('/members', memberRoutes);
 app.use('/tasks', tasksRoutes);
 
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' }); // Specify the directory to store uploads
+
+app.use(upload.single('attachments')); // Use multer middleware for handling file uploads
+
 // Authentication route
 app.get('/auth', (req, res) => {
   const authUrlParams = {
@@ -112,5 +117,5 @@ app.get('/logout', (req, res) => {
   });
 });
 
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 3004;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
