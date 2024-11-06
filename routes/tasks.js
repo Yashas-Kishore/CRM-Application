@@ -50,13 +50,18 @@ router.post('/create', ensureAuthenticated, async (req, res) => {
       dueDateTime: dueDateTime ? { dateTime: dueDateTime, timeZone: 'UTC' } : null
     };
 
-    await axios.post(`https://graph.microsoft.com/v1.0/me/todo/lists/${defaultListId}/tasks`, taskData, {
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
-    });
+    const createTaskResponse = await axios.post(
+      `https://graph.microsoft.com/v1.0/me/todo/lists/${defaultListId}/tasks`,
+      taskData,
+      {
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+      }
+    );
 
-    res.redirect('/tasks');
+    // Temporary success response for debugging
+    res.status(200).json({ message: 'Task created successfully', task: createTaskResponse.data });
   } catch (error) {
-    console.error('Error creating task:', error);
+    console.error('Error creating task:', error.response?.data || error.message);
     res.status(500).send('Error creating task');
   }
 });
@@ -84,6 +89,5 @@ router.post('/:taskId/delete', ensureAuthenticated, async (req, res) => {
     res.status(500).send('Error deleting task');
   }
 });
-
 
 module.exports = router;

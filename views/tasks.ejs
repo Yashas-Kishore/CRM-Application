@@ -9,25 +9,74 @@
       color: #333;
       margin: 20px;
     }
-    .task-container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    h1 { text-align: center; color: #0078d4; }
-    .task, .task-form { border: 1px solid #ddd; padding: 10px; margin-bottom: 15px; }
-    .task-details { font-size: 0.9em; color: #666; }
-    .delete-button { background: #e74c3c; color: white; border: none; cursor: pointer; padding: 5px; }
-    .form-group { margin-bottom: 15px; }
+    .task-container { 
+      max-width: 600px; 
+      margin: 0 auto; 
+      padding: 20px; 
+    }
+    h1 { 
+      text-align: center; 
+      color: #0078d4; 
+    }
+    .task, .task-form { 
+      border: 1px solid #ddd; 
+      padding: 10px; 
+      margin-bottom: 15px; 
+      border-radius: 5px;
+    }
+    .task-details { 
+      font-size: 0.9em; 
+      color: #666; 
+    }
+    .delete-button { 
+      background: #e74c3c; 
+      color: white; 
+      border: none; 
+      cursor: pointer; 
+      padding: 5px; 
+      border-radius: 3px;
+    }
+    .form-group { 
+      margin-bottom: 15px; 
+    }
+    .submit-button {
+      background: #0078d4; 
+      color: white; 
+      border: none; 
+      cursor: pointer; 
+      padding: 10px 15px; 
+      border-radius: 3px;
+    }
   </style>
+  <!-- Include Axios CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
   <div class="task-container">
     <h1>My Tasks</h1>
 
-    <% if (tasks.length > 0) { %>
+    <% if (tasks && tasks.length > 0) { %>
       <% tasks.forEach(task => { %>
         <div class="task">
           <div>
             <p><strong><%= task.title %></strong></p>
             <% if (task.dueDateTime) { %>
               <p class="task-details">Due: <%= new Date(task.dueDateTime.dateTime).toLocaleString() %></p>
+            <% } %>
+            <% if (task.description) { %>
+              <p class="task-details">Description: <%= task.description %></p>
+            <% } %>
+            <% if (task.priority) { %>
+              <p class="task-details">Priority: <%= task.priority %></p>
+            <% } %>
+            <% if (task.status) { %>
+              <p class="task-details">Status: <%= task.status %></p>
+            <% } %>
+            <% if (task.account) { %>
+              <p class="task-details">Account: <%= task.account %></p>
+            <% } %>
+            <% if (task.taskOwner) { %>
+              <p class="task-details">Task Owner: <%= task.taskOwner %></p>
             <% } %>
           </div>
           <form action="/tasks/<%= task.id %>/delete" method="POST">
@@ -41,18 +90,89 @@
 
     <!-- Task creation form -->
     <div class="task-form">
-      <form action="/tasks/create" method="POST">
+      <h2>Add New Task</h2>
+      <form id="taskForm" onsubmit="createTask(event)">
         <div class="form-group">
           <label for="taskTitle">Task Title:</label>
           <input type="text" id="taskTitle" name="taskTitle" required>
         </div>
         <div class="form-group">
+          <label for="description">Description:</label>
+          <textarea id="description" name="description" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="priority">Priority:</label>
+          <select id="priority" name="priority">
+            <option value="low">Low</option>
+            <option value="normal">Normal</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+        <div class="form-group">
           <label for="dueDateTime">Due Date (optional):</label>
           <input type="datetime-local" id="dueDateTime" name="dueDateTime">
         </div>
-        <button type="submit">Add Task</button>
+        <div class="form-group">
+          <label for="account">Account:</label>
+          <input type="text" id="account" name="account" required>
+        </div>
+        <div class="form-group">
+          <label for="taskOwner">Task Owner:</label>
+          <input type="text" id="taskOwner" name="taskOwner" required>
+        </div>
+        <div class="form-group">
+          <label for="reminder">Reminder (optional):</label>
+          <input type="datetime-local" id="reminder" name="reminder">
+        </div>
+        <div class="form-group">
+          <label for="repeat">Repeat (optional):</label>
+          <input type="text" id="repeat" name="repeat">
+        </div>
+        <div class="form-group">
+          <label for="closedTime">Closed Time (optional):</label>
+          <input type="datetime-local" id="closedTime" name="closedTime">
+        </div>
+        <div class="form-group">
+          <label for="attachments">Attachments (optional):</label>
+          <input type="file" id="attachments" name="attachments">
+        </div>
+        <button type="submit" class="submit-button">Add Task</button>
       </form>
     </div>
   </div>
+
+  <script>
+    async function createTask(event) {
+      event.preventDefault();
+  
+      // Serialize form data to JSON
+      const form = document.getElementById('taskForm');
+      const formData = {
+        taskTitle: form.taskTitle.value,
+        description: form.description.value,
+        priority: form.priority.value,
+        dueDateTime: form.dueDateTime.value,
+        account: form.account.value,
+        taskOwner: form.taskOwner.value,
+        reminder: form.reminder.value,
+        repeat: form.repeat.value,
+        closedTime: form.closedTime.value
+      };
+  
+      try {
+        // Send JSON data with application/json header
+        await axios.post('/tasks/create', formData, {
+          headers: { 'Content-Type': 'application/json' }
+        });
+        alert('Task created successfully!');
+        form.reset(); // Reset the form after successful submission
+        location.reload(); // Refresh the page to display the new task
+  
+      } catch (error) {
+        console.error('Error creating task:', error.response ? error.response.data : error.message);
+        alert('Failed to create task. Please try again.');
+      }
+    }
+  </script>  
 </body>
 </html>
